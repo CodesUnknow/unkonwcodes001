@@ -1,18 +1,19 @@
-#Basic setting "pages number to crawl","Test web","Request header set"
+# Basic setting "pages number to crawl","Test web","Request header set"
 import random
-PAGES_SET = 3 
-#redis setting
+
+PAGES_SET = 2
+# redis setting
 HOST = 'localhost'
 PORT = 6379
 PASSWORD = 'dsjsd1111'
 REDIS_KEY_NAME = 'proxy'
-test_api ='https://www.baidu.com'
- 
+test_api = 'https://www.baidu.com'
+
 def randHeader():
-'''return a header with random explorer'''    
-    head_connection = ['Keep-Alive','close']
+    '''return a header with random explorer'''
+    head_connection = ['Keep-Alive', 'close']
     head_accept = ['text/html, application/xhtml+xml, */*']
-    head_accept_language = ['zh-CN,fr-FR;q=0.5','en-US,en;q=0.8,zh-Hans-CN;q=0.5,zh-Hans;q=0.3']
+    head_accept_language = ['zh-CN,fr-FR;q=0.5', 'en-US,en;q=0.8,zh-Hans-CN;q=0.5,zh-Hans;q=0.3']
     head_user_agent = ['Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; rv:11.0) like Gecko',
                        'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36',
                        'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; rv:11.0) like Gecko)',
@@ -32,12 +33,11 @@ def randHeader():
                        'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.92 Safari/537.1 LBBROWSER',
                        'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0; BIDUBrowser 2.x)',
                        'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.11 TaoBrowser/3.0 Safari/536.11']
-    
-    
+
     header = {
         'Connection': head_connection[0],
         'Accept': head_accept[0],
         'Accept-Language': head_accept_language[1],
-        'User-Agent': head_user_agent[random.randrange(0,len(head_user_agent))]
+        'User-Agent': head_user_agent[random.randrange(0, len(head_user_agent))]
     }
     return header
