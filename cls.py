@@ -3,14 +3,16 @@ import re
 import redis
 import os,time,random,threading
 from multiprocessing import Process,Pool,Queue
+from time import time
 import subprocess
 import aiohttp
 import asyncio
+
 try:
 	from aiohttp.errors import ProxyConnectionError,ServerDisconnectedError,ClientResponseError,ClientConnectorError
 except:
 	from aiohttp import ClientProxyConnectionError as ProxyConnectionError,ServerDisconnectedError,ClientResponseError,ClientConnectorError
-PAGES_SET = 3 
+PAGES_SET = 2 
 HOST = 'localhost'
 PORT = 6379
 PASSWORD = 'dsjsd1111'
@@ -191,11 +193,69 @@ def hello_w(loop):
 	print('hello')
 	loop.stop()
 	
-cp = CrawlProxy()
-db = RedisClient()
-proxy_list = crawltest(cp)
-loop = asyncio.get_event_loop()
-tasks = [test_single_proxy2(proxy) for proxy in proxy_list]
-loop.run_until_complete(asyncio.wait(tasks))
-loop.close()
-print ('total valid proxy number:%d'% len(valid_list))
+
+def get_html(url,pages,header):
+	url_all = url + str(pages)
+	try:
+		req=requests.get(url_all,headers=header)
+		return req
+	except requests.exceptions.ConnectionError as e:
+		print (e.code)
+		print (e.reason)
+def get_ProAddrList(html,pattern,proxylist):
+	result = re.compile(pattern).findall(html)
+	for add in result:
+		proxy_add=add[0]+':'+add[1]
+		proxylist.append(proxy_add)
+# 子进程要执行的代码
+def run_proc1(name):
+	print('Run child process %s (%s)...' % (name, os.getpid()))
+	url='https://www.kuaidaili.com/free/inha/'
+	pages = PAGES_SET
+	header = {'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'}
+	pattern = '<td data-title="IP">(.*?)</td>[\d|\D]+?<td data-title="PORT">(.*?)</td>'
+	proxylist = []
+	for index in range(1,pages):
+		html=get_html(url,index,header).text
+		get_ProAddrList(html,pattern,proxylist)
+	return proxylist
+def run_proc2(name):
+	print('Run child process %s (%s)...' % (name, os.getpid()))
+	url='http://www.xicidaili.com/nn/'
+	pages = PAGES_SET 
+	header = {'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'}
+	pattern = '<td class="country"><img src="http://fs.xicidaili.com/images/flag/cn.png"\
+ alt="Cn" /></td>[\d|\D]*?<td>(.*?)</td>[\d|\D]*?<td>(.*?)</td>'
+	proxylist = []
+	for index in range(1,pages):
+		html=get_html(url,index,header).text
+		get_ProAddrList(html,pattern,proxylist)
+	return proxylist
+if __name__=='__main__':
+	starttime = time()
+	run_proc1('no1')
+	#run_proc2('no2')
+	endtime = time()
+	print('total time %s:'%str(endtime-starttime))
+	starttime = time()
+	#run_proc1('no1')
+	run_proc2('no2')
+	endtime = time()
+	print('total time %s:'%str(endtime-starttime))
+	sleep(5
+	p1 = Process(target = run_proc1,args=('no1',))
+	p2 = Process(target = run_proc2,args=('no2',))
+	starttime = time()
+	p1.start()
+	p2.start()
+	p1.join()
+	p2.join()
+	endtime = time()
+	print('total time %s:'%str(endtime-starttime))
+	
+    #print('Parent process %s.' % os.getpid())
+    #p = Process(target=run_proc, args=('test',))
+    #print('Child process will start.')
+    #p.start()
+    #p.join()
+    #print('Child process end.')
