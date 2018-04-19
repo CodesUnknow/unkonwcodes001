@@ -6,18 +6,11 @@ from multiprocessing import Process,Pool,Queue
 import subprocess
 import aiohttp
 import asyncio
+from setting import *
 try:
 	from aiohttp.errors import ProxyConnectionError,ServerDisconnectedError,ClientResponseError,ClientConnectorError
 except:
 	from aiohttp import ClientProxyConnectionError as ProxyConnectionError,ServerDisconnectedError,ClientResponseError,ClientConnectorError
-PAGES_SET = 3 
-HOST = 'localhost'
-PORT = 6379
-PASSWORD = 'dsjsd1111'
-REDIS_KEY_NAME = 'proxy'
-test_api ='https://www.baidu.com'
-valid_list = []
-HEADERS = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8','Accept-Encoding':'gzip, deflate, br','Accept-Language':' en-US,en;q=0.5','User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0'}
 #temp error name:aiohttp.client_exceptions.ClientOSError
 async def test_single_proxy(proxy):
 	try:
@@ -191,11 +184,12 @@ def hello_w(loop):
 	print('hello')
 	loop.stop()
 	
-cp = CrawlProxy()
+headers =randHeader()
+print(headers)
+'''cp = CrawlProxy()
 db = RedisClient()
 proxy_list = crawltest(cp)
 loop = asyncio.get_event_loop()
 tasks = [test_single_proxy2(proxy) for proxy in proxy_list]
 loop.run_until_complete(asyncio.wait(tasks))
-loop.close()
-print ('total valid proxy number:%d'% len(valid_list))
+loop.close()'''
