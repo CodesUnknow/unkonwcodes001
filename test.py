@@ -269,8 +269,42 @@ def loop():
         print('thread %s >>> %s' % (threading.current_thread().name, n))
         time.sleep(1)
     print('thread %s ended.' % threading.current_thread().name)
+def simple():
+	print('--> coroutine started')
+	x = yield
+	print('--> coroutine recieved:',x)
+def simple2(a):
+	print('--> started:a=',a)
+	b = yield a
+	print('--> started:b=',b)
+	c = yield a+b
+	print('--> started:c=',c)
 
+from functools import wraps
+def coroutine(func):
+	@wraps(func)
+	def prime(*args,**kwargs):
+		gen = func(*args,**kwargs)
+		next(gen)
+		return gen
+	return prime
+
+@coroutine
+def averager():
+	total = 0.0
+	average1 = None
+	count = 0
+	while True:
+		term = yield print(average1)
+		total += term
+		count += 1
+		average1 = total/count
 if __name__ == '__main__':
+	from inspect import getgeneratorstate
+	ave = averager()
+	print(getgeneratorstate(ave))
+	ave.send(2)
+	ave.send(20)
     #starttime = time.time()
     #run_proc1('no1')
     # run_proc2('no2')
@@ -292,19 +326,19 @@ if __name__ == '__main__':
     #print('total time %s:' % str(endtime - starttime))
 
 
-    print('thread %s is running...' % threading.current_thread().name)
-    t1 = threading.Thread(target=run_proc1, name='LoopThread')
-    t2 = threading.Thread(target=run_proc2, name='LoopThread2')
-    starttime = time.time()
-    #t1.start()
-    #t2.start()
-    #t1.join()
-    #t2.join()
-    l1=run_proc1()
-    l2=run_proc2()
-    print('thread %s ended.' % threading.current_thread().name)
-    endtime = time.time()
-    print('thread total time %s:' % str(endtime - starttime))
+    #print('thread %s is running...' % threading.current_thread().name)
+    #t1 = threading.Thread(target=run_proc1, name='LoopThread')
+    #t2 = threading.Thread(target=run_proc2, name='LoopThread2')
+    #starttime = time.time()
+    ##t1.start()
+    ##t2.start()
+    ##t1.join()
+    ##t2.join()
+    #l1=run_proc1()
+    #l2=run_proc2()
+    #print('thread %s ended.' % threading.current_thread().name)
+    ##endtime = time.time()
+    #print('thread total time %s:' % str(endtime - starttime))
     # print('Parent process %s.' % os.getpid())
     # p = Process(target=run_proc, args=('test',))
     # print('Child process will start.')
